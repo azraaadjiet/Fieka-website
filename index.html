@@ -1,0 +1,1368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fieka — Aspire to Inspire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&family=Barlow+Condensed:ital,wght@0,400;0,600;0,700;0,800;0,900;1,700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── RESET & BASE ──────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #000;
+      color: #fff;
+      overflow-x: hidden;
+      cursor: none;
+    }
+    a { color: inherit; text-decoration: none; }
+    img { display: block; max-width: 100%; }
+    button { cursor: none; border: none; background: none; font-family: inherit; }
+
+    /* ─── CUSTOM CURSOR ─────────────────────────────────────── */
+    #cursor-dot {
+      width: 8px; height: 8px;
+      background: #fff;
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: width 0.2s, height 0.2s, background 0.2s;
+    }
+    #cursor-ring {
+      width: 36px; height: 36px;
+      border: 1.5px solid rgba(255,255,255,0.6);
+      border-radius: 50%;
+      position: fixed; top: 0; left: 0;
+      pointer-events: none; z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.12s ease, width 0.3s, height 0.3s, border-color 0.3s;
+    }
+    body:has(a:hover) #cursor-dot,
+    body:has(button:hover) #cursor-dot { width: 14px; height: 14px; background: #fff; }
+    body:has(a:hover) #cursor-ring,
+    body:has(button:hover) #cursor-ring { width: 52px; height: 52px; border-color: #fff; }
+
+    /* ─── LOADER ────────────────────────────────────────────── */
+    #loader {
+      position: fixed; inset: 0;
+      background: #000; z-index: 9000;
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 20px;
+      transition: opacity 0.8s ease, visibility 0.8s;
+    }
+    #loader.hidden { opacity: 0; visibility: hidden; }
+    #loader-logo { width: 220px; opacity: 0; animation: loaderFade 0.6s ease 0.3s forwards; }
+    #loader-bar-wrap {
+      width: 200px; height: 1px; background: rgba(255,255,255,0.15); overflow: hidden;
+      opacity: 0; animation: loaderFade 0.4s ease 0.5s forwards;
+    }
+    #loader-bar {
+      height: 100%; width: 0; background: #fff;
+      animation: loaderProgress 1.4s ease 0.6s forwards;
+    }
+    @keyframes loaderFade { to { opacity: 1; } }
+    @keyframes loaderProgress { to { width: 100%; } }
+
+    /* ─── SITE HEADER (fixed wrapper) ──────────────────────── */
+    #site-header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 800;
+      transition: background 0.4s ease, backdrop-filter 0.4s ease;
+    }
+    #site-header.scrolled {
+      background: rgba(0,0,0,0.93);
+      backdrop-filter: blur(14px);
+    }
+    /* Push page content below the fixed header (~40px bar + 70px nav) */
+    body > section:first-of-type,
+    .hero { padding-top: 130px; }
+
+    /* ─── ANNOUNCEMENT BAR ──────────────────────────────────── */
+    .announcement-bar {
+      background: #111; color: #fff;
+      font-size: 11px; letter-spacing: 0.12em;
+      text-transform: uppercase; font-weight: 500;
+      overflow: hidden; white-space: nowrap;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .announcement-track {
+      display: inline-flex; gap: 80px;
+      animation: marqueeScroll 22s linear infinite;
+    }
+    .announcement-track span { display: inline-block; }
+    @keyframes marqueeScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+    /* ─── NAVIGATION ────────────────────────────────────────── */
+    nav {
+      padding: 0 40px;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 90px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    /* nav has no own background — #site-header handles it */
+    .nav-logo img {
+      height: 80px;
+      mix-blend-mode: screen; /* makes black bg transparent on dark nav */
+    }
+    .nav-links {
+      display: flex; gap: 36px;
+      font-size: 11.5px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500;
+    }
+    .nav-links a { position: relative; padding-bottom: 3px; }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: 0; left: 0; width: 0; height: 1px;
+      background: #fff; transition: width 0.3s ease;
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-right {
+      display: flex; align-items: center; gap: 24px;
+      font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500;
+    }
+    .nav-right .currency { opacity: 0.5; }
+    .nav-icon { width: 20px; height: 20px; opacity: 0.85; }
+    .nav-icon svg { width: 100%; height: 100%; fill: none; stroke: #fff; stroke-width: 1.5; stroke-linecap: round; }
+
+    /* mobile toggle */
+    .nav-burger { display: none; flex-direction: column; gap: 5px; }
+    .nav-burger span { display: block; width: 22px; height: 1.5px; background: #fff; transition: transform 0.3s, opacity 0.3s; }
+
+    /* ─── HERO ──────────────────────────────────────────────── */
+    .hero {
+      position: relative; overflow: hidden;
+      background: #000;
+      /* height adjusts to image, but clamped */
+    }
+    /* Full hero image — no cropping, natural aspect ratio */
+    .hero-full-img {
+      display: block;
+      width: 100%;
+      height: auto;
+      min-height: 420px;
+      object-fit: contain;
+      object-position: center;
+      will-change: transform;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0.28) 0%,
+        rgba(0,0,0,0.08) 35%,
+        rgba(0,0,0,0.55) 75%,
+        #000 100%
+      );
+    }
+    .hero-model { display: none; } /* replaced by full-image approach */
+    .hero-content {
+      position: absolute; bottom: 0; left: 0; z-index: 3;
+      padding: 0 60px 70px;
+      max-width: 960px;
+    }
+    .hero-eyebrow {
+      font-size: 11px; letter-spacing: 0.25em; text-transform: uppercase;
+      color: rgba(255,255,255,0.55); margin-bottom: 20px;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 0.7s ease 0.6s, transform 0.7s ease 0.6s;
+    }
+    .hero-eyebrow.visible { opacity: 1; transform: translateY(0); }
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(72px, 10vw, 148px);
+      line-height: 0.9; letter-spacing: 0.02em;
+      overflow: hidden;
+    }
+    .hero-title .word {
+      display: block; overflow: hidden;
+    }
+    .hero-title .word span {
+      display: block;
+      transform: translateY(110%);
+      transition: transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .hero-title .word.visible span { transform: translateY(0); }
+    .hero-title .word:nth-child(2) span { transition-delay: 0.12s; }
+    .hero-subtitle {
+      margin-top: 28px; font-size: 13px; letter-spacing: 0.1em;
+      color: rgba(255,255,255,0.6); text-transform: uppercase; font-weight: 400;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 0.8s ease 0.9s, transform 0.8s ease 0.9s;
+      max-width: 420px; line-height: 1.8;
+    }
+    .hero-subtitle.visible { opacity: 1; transform: translateY(0); }
+    .hero-ctas {
+      margin-top: 40px; display: flex; gap: 16px; flex-wrap: wrap;
+      opacity: 0; transform: translateY(16px);
+      transition: opacity 0.8s ease 1.1s, transform 0.8s ease 1.1s;
+    }
+    .hero-ctas.visible { opacity: 1; transform: translateY(0); }
+    .btn-primary {
+      padding: 14px 36px;
+      background: #fff; color: #000;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600;
+      transition: background 0.25s, color 0.25s, transform 0.2s;
+    }
+    .btn-primary:hover { background: #e0e0e0; transform: translateY(-2px); }
+    .btn-ghost {
+      padding: 13px 35px;
+      border: 1px solid rgba(255,255,255,0.4); color: #fff;
+      font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase; font-weight: 600;
+      transition: border-color 0.25s, background 0.25s, transform 0.2s;
+    }
+    .btn-ghost:hover { border-color: #fff; background: rgba(255,255,255,0.06); transform: translateY(-2px); }
+
+    /* Scroll indicator */
+    .hero-scroll {
+      position: absolute; bottom: 36px; right: 60px; z-index: 3;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(255,255,255,0.45);
+      opacity: 0; animation: fadeIn 0.8s ease 2s forwards;
+    }
+    .scroll-line {
+      width: 1px; height: 50px; background: rgba(255,255,255,0.2); overflow: hidden;
+      position: relative;
+    }
+    .scroll-line::after {
+      content: '';
+      position: absolute; top: -100%; left: 0;
+      width: 100%; height: 100%; background: #fff;
+      animation: scrollDrop 1.8s ease-in-out 2.2s infinite;
+    }
+    @keyframes scrollDrop { 0% { top: -100%; } 100% { top: 100%; } }
+    @keyframes fadeIn { to { opacity: 1; } }
+
+    /* ─── MARQUEE TICKER ────────────────────────────────────── */
+    .marquee-section {
+      background: #fff; color: #000;
+      padding: 16px 0; overflow: hidden;
+      border-top: 1px solid #e8e8e8;
+      border-bottom: 1px solid #e8e8e8;
+    }
+    .marquee-track {
+      display: inline-flex; gap: 64px; white-space: nowrap;
+      animation: marqueeScroll 18s linear infinite;
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 18px; font-weight: 700; letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+    .marquee-track .dot { color: #888; }
+
+    /* ─── SECTION UTILITIES ─────────────────────────────────── */
+    .section-label {
+      font-size: 10px; letter-spacing: 0.3em; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); margin-bottom: 14px;
+    }
+    .section-label.dark { color: rgba(0,0,0,0.4); }
+    .section-heading {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(42px, 5.5vw, 80px);
+      line-height: 0.95; letter-spacing: 0.02em;
+    }
+
+    /* Reveal animation base */
+    .reveal {
+      opacity: 0; transform: translateY(40px);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-left {
+      opacity: 0; transform: translateX(-40px);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+    .reveal-right {
+      opacity: 0; transform: translateX(40px);
+      transition: opacity 0.85s cubic-bezier(0.16,1,0.3,1), transform 0.85s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+    .delay-1 { transition-delay: 0.1s !important; }
+    .delay-2 { transition-delay: 0.2s !important; }
+    .delay-3 { transition-delay: 0.3s !important; }
+    .delay-4 { transition-delay: 0.4s !important; }
+    .delay-5 { transition-delay: 0.5s !important; }
+
+    /* ─── PRODUCT GRID ──────────────────────────────────────── */
+    .products-section {
+      padding: 80px 40px 100px;
+      background: #111;
+    }
+    .products-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 52px;
+    }
+    .products-header .badge {
+      display: inline-block;
+      padding: 6px 16px;
+      border: 1px solid rgba(255,255,255,0.2);
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5); margin-bottom: 12px;
+    }
+    .view-all-link {
+      font-size: 10.5px; letter-spacing: 0.18em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5); border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 2px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .view-all-link:hover { color: #fff; border-color: #fff; }
+    .products-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+    }
+    /* ── UNIFIED PRODUCT CARD (women's + men's same structure) ── */
+    .product-card {
+      background: #e8e8e8; position: relative; overflow: hidden;
+      aspect-ratio: 3/4;
+    }
+    .product-card-img {
+      width: 100%; height: 100%;
+      object-fit: cover; object-position: top center;
+      transition: transform 0.75s cubic-bezier(0.16,1,0.3,1);
+    }
+    .product-card:hover .product-card-img { transform: scale(1.04); }
+
+    /* Top icons: heart (left) + bag (right) */
+    .card-icons {
+      position: absolute; top: 13px; left: 13px; right: 13px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 3; pointer-events: none;
+      opacity: 0; transition: opacity 0.3s ease;
+    }
+    .product-card:hover .card-icons { opacity: 1; pointer-events: all; }
+    .card-icon-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      display: flex; align-items: center; justify-content: center;
+      border: none; cursor: none;
+      transition: background 0.2s, transform 0.2s;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.12);
+    }
+    .card-icon-btn:hover { background: #fff; transform: scale(1.08); }
+    .card-icon-btn svg { width: 15px; height: 15px; fill: none; stroke: #111; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    .card-icon-btn.wishlist svg { stroke-width: 1.5; }
+
+    /* Slide-up info panel */
+    .product-card-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 14px 16px 16px;
+      background: #fff;
+      transform: translateY(100%);
+      transition: transform 0.38s cubic-bezier(0.16,1,0.3,1);
+    }
+    .product-card:hover .product-card-info { transform: translateY(0); }
+
+    .product-badge {
+      display: inline-block;
+      font-size: 8px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(0,0,0,0.4); margin-bottom: 5px;
+      padding: 2px 7px; border: 1px solid rgba(0,0,0,0.15);
+    }
+    .product-name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 19px; font-weight: 800; letter-spacing: 0.04em;
+      text-transform: uppercase; line-height: 1.1; color: #000;
+    }
+    /* Footer row: price left, swatches right */
+    .product-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 8px;
+    }
+    .product-price {
+      font-size: 12.5px; color: rgba(0,0,0,0.55); letter-spacing: 0.04em;
+    }
+    .product-swatches {
+      display: flex; gap: 5px; align-items: center;
+    }
+    .swatch {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 1.5px solid rgba(0,0,0,0.12);
+      display: inline-block; cursor: none;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .swatch:hover { transform: scale(1.22); box-shadow: 0 0 0 2px rgba(0,0,0,0.2); }
+    /* legacy add btn — hidden now icons handle it */
+    .product-add-btn { display: none; }
+
+    /* ─── FIEKA ACTIVE BANNER ───────────────────────────────── */
+    .active-banner {
+      position: relative; overflow: hidden;
+      min-height: 600px;
+    }
+    .active-banner img.active-bg {
+      display: block;
+      width: 100%;
+      height: 600px;
+      object-fit: cover;
+      object-position: center;
+    }
+    .active-banner-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to right, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.2) 60%, rgba(0,0,0,0.6) 100%);
+    }
+    .active-banner-right {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: center;
+      padding: 80px 60px;
+    }
+    .active-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(60px, 7vw, 110px);
+      line-height: 0.88; letter-spacing: 0.03em;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.6) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .active-sub {
+      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.4); margin-top: 20px; line-height: 2;
+    }
+    .active-cta {
+      margin-top: 44px; display: flex; gap: 14px; flex-wrap: wrap;
+    }
+    .ticker-small {
+      overflow: hidden; white-space: nowrap;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      padding: 10px 0; margin-top: 36px;
+    }
+    .ticker-small-track {
+      display: inline-flex; gap: 50px;
+      animation: marqueeScroll 14s linear infinite;
+      font-size: 10px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ─── MEN'S SECTION ─────────────────────────────────────── */
+    .mens-section {
+      padding: 80px 40px 100px;
+      background: #111; color: #fff;
+    }
+    .mens-section .section-heading { color: #fff; }
+    .mens-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 52px;
+    }
+    .mens-header .view-all-link { color: rgba(255,255,255,0.45); border-color: rgba(255,255,255,0.25); }
+    .mens-header .view-all-link:hover { color: #fff; border-color: #fff; }
+    .mens-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+    }
+    /* Men's cards inherit ALL styles from .product-card — no overrides needed */
+    .mens-card { /* alias — same as product-card */ }
+
+    /* ─── SPORT HERO ─────────────────────────────────────────── */
+    .sport-hero {
+      position: relative; overflow: hidden;
+      height: 70vh; min-height: 500px;
+      display: flex; align-items: center; justify-content: center;
+      background: #000;
+    }
+    .sport-hero-bg {
+      position: absolute; inset: 0;
+      background: url('img_11.png') center 30%/cover no-repeat;
+      transform: scale(1.06);
+      will-change: transform;
+    }
+    .sport-hero-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.55);
+    }
+    .sport-hero-content {
+      position: relative; z-index: 2;
+      text-align: center; padding: 0 40px;
+    }
+    .sport-hero-label {
+      font-size: 10px; letter-spacing: 0.35em; text-transform: uppercase;
+      color: rgba(255,255,255,0.55); margin-bottom: 22px;
+    }
+    .sport-hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 8vw, 130px);
+      line-height: 0.9; letter-spacing: 0.03em;
+    }
+    .sport-hero .btn-primary { margin-top: 40px; }
+
+    /* ─── SPORT KITS ─────────────────────────────────────────── */
+    .kits-section {
+      padding: 80px 40px 100px;
+      background: #0a0a0a;
+    }
+    .kits-header {
+      display: flex; align-items: flex-end; justify-content: space-between;
+      margin-bottom: 52px;
+    }
+    .kits-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;
+    }
+    .kit-card {
+      position: relative; overflow: hidden;
+      aspect-ratio: 2/3; background: #111;
+    }
+    .kit-card img {
+      width: 100%; height: 100%; object-fit: cover; object-position: top center;
+      transition: transform 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.5s;
+      filter: brightness(0.85);
+    }
+    .kit-card:hover img { transform: scale(1.08); filter: brightness(1); }
+    .kit-card-info {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 28px 24px;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.1) 55%, transparent 100%);
+    }
+    .kit-name {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 32px; letter-spacing: 0.04em; line-height: 1;
+    }
+    .kit-customizable {
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+      color: rgba(255,255,255,0.45); margin-top: 6px;
+    }
+    .kit-cta {
+      margin-top: 16px;
+      display: inline-block;
+      padding: 9px 20px;
+      border: 1px solid rgba(255,255,255,0.35);
+      font-size: 9px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: #fff;
+      transition: background 0.25s, border-color 0.25s;
+      width: fit-content;
+    }
+    .kit-cta:hover { background: rgba(255,255,255,0.12); border-color: #fff; }
+
+    /* ─── QUOTE FORM ─────────────────────────────────────────── */
+    .quote-section {
+      padding: 100px 40px;
+      background: #fff; color: #000;
+      position: relative; overflow: hidden;
+    }
+    .quote-section::before {
+      content: 'QUOTE';
+      position: absolute; top: -0.1em; right: -0.05em;
+      font-family: 'Bebas Neue', sans-serif; font-size: 28vw;
+      color: rgba(0,0,0,0.03); line-height: 1;
+      pointer-events: none; white-space: nowrap;
+    }
+    .quote-inner {
+      max-width: 860px; margin: 0 auto; position: relative; z-index: 1;
+    }
+    .quote-icon {
+      width: 40px; height: 40px; margin: 0 auto 28px;
+      opacity: 0.25;
+    }
+    .quote-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(48px, 6vw, 88px);
+      letter-spacing: 0.04em; text-align: center; line-height: 0.95;
+    }
+    .quote-sub {
+      text-align: center; margin-top: 14px;
+      font-size: 13px; color: rgba(0,0,0,0.5); letter-spacing: 0.04em; line-height: 1.7;
+    }
+    .quote-form { margin-top: 52px; display: flex; flex-direction: column; gap: 14px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .form-input {
+      width: 100%; padding: 16px 18px;
+      border: 1px solid rgba(0,0,0,0.15); background: transparent;
+      font-size: 13.5px; color: #000; font-family: inherit; letter-spacing: 0.02em;
+      transition: border-color 0.25s;
+      outline: none; border-radius: 0;
+    }
+    .form-input::placeholder { color: rgba(0,0,0,0.35); }
+    .form-input:focus { border-color: #000; }
+    .form-textarea {
+      resize: vertical; min-height: 120px; line-height: 1.6;
+    }
+    .form-select {
+      appearance: none;
+      background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23000' stroke-width='1.5' fill='none'/%3E%3C/svg%3E") no-repeat right 18px center;
+    }
+    .btn-submit {
+      width: 100%; padding: 18px;
+      background: #000; color: #fff;
+      font-size: 11px; letter-spacing: 0.22em; text-transform: uppercase; font-weight: 600;
+      font-family: inherit;
+      transition: background 0.25s, transform 0.2s;
+      margin-top: 8px;
+    }
+    .btn-submit:hover { background: #222; transform: translateY(-2px); }
+
+    /* ─── CATEGORY CARDS ─────────────────────────────────────── */
+    .categories-section {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      background: #000; gap: 2px;
+    }
+    .cat-card {
+      position: relative; overflow: hidden;
+      aspect-ratio: 3/4; max-height: 70vh;
+      display: flex; align-items: flex-end;
+    }
+    .cat-card img {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%; object-fit: cover; object-position: top;
+      transition: transform 0.8s cubic-bezier(0.16,1,0.3,1), filter 0.5s;
+      filter: brightness(0.75);
+    }
+    .cat-card:hover img { transform: scale(1.07); filter: brightness(0.9); }
+    .cat-card-content {
+      position: relative; z-index: 2; width: 100%;
+      padding: 30px 28px;
+      background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    }
+    .cat-card-label {
+      font-size: 9px; letter-spacing: 0.28em; text-transform: uppercase;
+      color: rgba(255,255,255,0.5); margin-bottom: 8px;
+    }
+    .cat-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 44px; line-height: 0.95; letter-spacing: 0.03em;
+    }
+    .cat-card-desc {
+      font-size: 11.5px; color: rgba(255,255,255,0.55);
+      margin-top: 8px; line-height: 1.65; letter-spacing: 0.02em;
+    }
+    .cat-card-cta {
+      margin-top: 20px; display: inline-block;
+      font-size: 9px; letter-spacing: 0.22em; text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,255,255,0.4);
+      padding-bottom: 3px;
+      transition: border-color 0.25s, color 0.25s;
+    }
+    .cat-card-cta:hover { border-color: #fff; }
+
+    /* ─── STATS BAR ─────────────────────────────────────────── */
+    .stats-bar {
+      background: #fff; color: #000;
+      padding: 60px 40px;
+      display: grid; grid-template-columns: repeat(4,1fr);
+      gap: 20px; border-top: 1px solid #e8e8e8;
+    }
+    .stat-item { text-align: center; }
+    .stat-number {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(44px, 5vw, 72px);
+      line-height: 1; letter-spacing: 0.02em;
+    }
+    .stat-label {
+      font-size: 10px; letter-spacing: 0.2em; text-transform: uppercase;
+      color: rgba(0,0,0,0.45); margin-top: 8px;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────────── */
+    footer {
+      background: #000; color: #fff;
+      padding: 80px 40px 40px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+    .footer-top {
+      display: grid; grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 40px; padding-bottom: 60px;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .footer-brand img {
+      height: 28px; filter: brightness(0) invert(1);
+      margin-bottom: 22px;
+    }
+    .footer-tagline {
+      font-size: 12.5px; color: rgba(255,255,255,0.4);
+      line-height: 1.75; max-width: 220px;
+    }
+    .footer-col-title {
+      font-size: 9.5px; letter-spacing: 0.22em; text-transform: uppercase;
+      font-weight: 700; color: #fff; margin-bottom: 22px;
+    }
+    .footer-links { display: flex; flex-direction: column; gap: 13px; }
+    .footer-links a {
+      font-size: 13px; color: rgba(255,255,255,0.4);
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: #fff; }
+    .footer-bottom {
+      padding-top: 30px;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 11px; color: rgba(255,255,255,0.25); letter-spacing: 0.06em;
+    }
+    .social-links { display: flex; gap: 20px; }
+    .social-links a {
+      font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase;
+      color: rgba(255,255,255,0.35); transition: color 0.2s;
+    }
+    .social-links a:hover { color: #fff; }
+
+    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 1024px) {
+      .products-grid, .mens-grid, .kits-grid { grid-template-columns: repeat(2,1fr); }
+      .active-banner { grid-template-columns: 1fr; }
+      .active-banner-left { min-height: 50vh; }
+      .stats-bar { grid-template-columns: repeat(2,1fr); }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 30px; }
+    }
+    @media (max-width: 768px) {
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+      .nav-burger { display: flex; }
+      .hero-content { padding: 0 24px 80px; }
+      .hero-model { right: -10%; height: 70%; opacity: 0.3; }
+      .products-section, .mens-section, .kits-section, .quote-section { padding: 60px 20px 80px; }
+      .categories-section { grid-template-columns: 1fr; }
+      .form-row { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .footer-bottom { flex-direction: column; gap: 16px; text-align: center; }
+      .hero-scroll { display: none; }
+      .stats-bar { padding: 40px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CURSOR -->
+  <div id="cursor-dot"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- LOADER -->
+  <div id="loader">
+    <img id="loader-logo" src="img_27.png" alt="Fieka" />
+    <div id="loader-bar-wrap"><div id="loader-bar"></div></div>
+  </div>
+
+  <!-- FIXED SITE HEADER: announcement + nav stacked, no overlap -->
+  <header id="site-header">
+
+  <!-- ANNOUNCEMENT BAR -->
+  <div class="announcement-bar">
+    <div class="announcement-track">
+      <span>Free Delivery on All South Africa Orders Over R1 000</span>
+      <span>·</span>
+      <span>New Modestwear Collection — Available Now</span>
+      <span>·</span>
+      <span>Customizable Team Kits — Get a Quote Today</span>
+      <span>·</span>
+      <span>Free Delivery on All South Africa Orders Over R1 000</span>
+      <span>·</span>
+      <span>New Modestwear Collection — Available Now</span>
+      <span>·</span>
+      <span>Customizable Team Kits — Get a Quote Today</span>
+      <span>·</span>
+    </div>
+  </div>
+
+  <!-- NAVIGATION (sits below the announcement bar) -->
+  <nav id="main-nav">
+    <a href="#" class="nav-logo">
+      <img src="img_27.png" alt="Fieka" />
+    </a>
+    <div class="nav-links">
+      <a href="#">Women</a>
+      <a href="#">Men</a>
+      <a href="Fieka Sport — Team Kits.html">Sport</a>
+      <a href="#">About Us</a>
+    </div>
+    <div class="nav-right">
+      <span class="currency">ZAR | R</span>
+      <a href="#" class="nav-icon" aria-label="Search">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="16.5" y1="16.5" x2="22" y2="22"/></svg>
+      </a>
+      <a href="#" class="nav-icon" aria-label="Cart">
+        <svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+      </a>
+    </div>
+    <button class="nav-burger" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  </header><!-- end #site-header -->
+
+  <!-- HERO — full stadium image, no crop -->
+  <section class="hero" id="hero">
+    <!-- Full image: width 100%, height auto — shows entire image, zero crop -->
+    <img src="hero-stadium.png" alt="Fieka Sport" class="hero-full-img" id="hero-bg" />
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow" id="hero-eyebrow">New Collection — 2025</div>
+      <h1 class="hero-title">
+        <div class="word" id="word-1"><span>Aspire</span></div>
+        <div class="word" id="word-2"><span>To Inspire</span></div>
+      </h1>
+      <p class="hero-subtitle" id="hero-subtitle">
+        Designed in Cape Town. Built for discipline and growth.<br />
+        Created for those who train with purpose.
+      </p>
+      <div class="hero-ctas" id="hero-ctas">
+        <a href="#" class="btn-primary">Shop Women</a>
+        <a href="#" class="btn-ghost">Shop Men</a>
+      </div>
+    </div>
+    <div class="hero-scroll">
+      <div class="scroll-line"></div>
+      <span>Scroll</span>
+    </div>
+  </section>
+
+  <!-- MARQUEE TICKER -->
+  <div class="marquee-section">
+    <div class="marquee-track">
+      <span>New Modestwear Collection</span>
+      <span class="dot">◆</span>
+      <span>Women's Just Dropped</span>
+      <span class="dot">◆</span>
+      <span>Axis Essentials</span>
+      <span class="dot">◆</span>
+      <span>Team Kits Available</span>
+      <span class="dot">◆</span>
+      <span>Designed in Cape Town</span>
+      <span class="dot">◆</span>
+      <span>New Modestwear Collection</span>
+      <span class="dot">◆</span>
+      <span>Women's Just Dropped</span>
+      <span class="dot">◆</span>
+      <span>Axis Essentials</span>
+      <span class="dot">◆</span>
+      <span>Team Kits Available</span>
+      <span class="dot">◆</span>
+      <span>Designed in Cape Town</span>
+      <span class="dot">◆</span>
+    </div>
+  </div>
+
+  <!-- WOMEN'S JUST DROPPED -->
+  <section class="products-section" id="womens">
+    <div class="products-header">
+      <div>
+        <span class="badge reveal">Just Dropped</span>
+        <h2 class="section-heading reveal delay-1">Women's<br/>Collection</h2>
+      </div>
+      <a href="#" class="view-all-link reveal delay-2">Shop All Women's</a>
+    </div>
+    <div class="products-grid">
+      <div class="product-card reveal delay-1">
+        <img src="products/1.jpg" alt="Ninja Top" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">Ninja Top</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#1a1a1a" title="Black"></span>
+              <span class="swatch" style="background:#4a5568" title="Charcoal"></span>
+              <span class="swatch" style="background:#718096" title="Slate"></span>
+              <span class="swatch" style="background:#f5f0e8" title="Cream"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-card reveal delay-2">
+        <img src="products/2.jpg" alt="Nomad Crew" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">Nomad Crew</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#1b4332" title="Forest Green"></span>
+              <span class="swatch" style="background:#1a1a1a" title="Black"></span>
+              <span class="swatch" style="background:#2c3e50" title="Navy"></span>
+              <span class="swatch" style="background:#8b7355" title="Camel"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-card reveal delay-3">
+        <img src="products/3.jpg" alt="SHIFT Trail Jacket" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">SHIFT Trail Jacket</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#a0a0a0" title="Grey"></span>
+              <span class="swatch" style="background:#1a1a1a" title="Black"></span>
+              <span class="swatch" style="background:#4a5e4a" title="Olive"></span>
+              <span class="swatch" style="background:#2c3e50" title="Navy"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-card reveal delay-4">
+        <img src="products/4.jpg" alt="Ninja Top — Sage" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">Ninja Top — Sage</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#7d9b76" title="Sage"></span>
+              <span class="swatch" style="background:#1a1a1a" title="Black"></span>
+              <span class="swatch" style="background:#4a5e4a" title="Olive"></span>
+              <span class="swatch" style="background:#f5f0e8" title="Cream"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FIEKA ACTIVE BANNER -->
+  <section class="active-banner">
+    <img src="img_36.png" alt="Fieka Active" class="active-bg" />
+    <div class="active-banner-overlay"></div>
+    <div class="active-banner-right">
+      <div class="section-label reveal">Modestwear</div>
+      <h2 class="active-title reveal delay-1">Fieka<br/>Active</h2>
+      <p class="active-sub reveal delay-2">
+        New Modestwear Collection<br />
+        Functional. Modest. Unstoppable.
+      </p>
+      <div class="active-cta reveal delay-3">
+        <a href="#" class="btn-primary">Shop Modestwear</a>
+        <a href="#" class="btn-ghost">View Lookbook</a>
+      </div>
+      <div class="ticker-small reveal delay-4">
+        <div class="ticker-small-track">
+          <span>Coverage Without Compromise</span>
+          <span>·</span>
+          <span>Performance-First Design</span>
+          <span>·</span>
+          <span>Every Body. Every Sport.</span>
+          <span>·</span>
+          <span>Coverage Without Compromise</span>
+          <span>·</span>
+          <span>Performance-First Design</span>
+          <span>·</span>
+          <span>Every Body. Every Sport.</span>
+          <span>·</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEN'S SECTION -->
+
+  <section class="mens-section" id="mens">
+    <div class="mens-header">
+      <div>
+        <div class="section-label dark reveal">New Arrivals</div>
+        <h2 class="section-heading reveal delay-1">Men's<br/>Essentials</h2>
+      </div>
+      <a href="#" class="view-all-link reveal delay-2">Shop All Men's</a>
+    </div>
+    <div class="mens-grid">
+      <div class="product-card reveal delay-1">
+        <img src="img_07_final.jpg" alt="Compression Long Sleeve" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">Compression Long Sleeve</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#1a1a1a" title="Black"></span>
+              <span class="swatch" style="background:#9ca3af" title="Grey"></span>
+              <span class="swatch" style="background:#14532d" title="Green"></span>
+              <span class="swatch" style="background:#7f1d1d" title="Red"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-card reveal delay-2">
+        <img src="img_08_final.jpg" alt="Sport Cargo Pants" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">Sport Cargo Pants</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#1a1a1a" title="Black"></span>
+              <span class="swatch" style="background:#6b7c5e" title="Olive"></span>
+              <span class="swatch" style="background:#d4c5a9" title="Cream"></span>
+              <span class="swatch" style="background:#7f1d1d" title="Red"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-card reveal delay-3">
+        <img src="img_09_final.jpg" alt="Mens Sport Tank" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">Mens Sport Tank</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#9ca3af" title="Grey"></span>
+              <span class="swatch" style="background:#1e3a5f" title="Dark Teal"></span>
+              <span class="swatch" style="background:#1d4ed8" title="Blue"></span>
+              <span class="swatch" style="background:#7f1d1d" title="Red"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="product-card reveal delay-4">
+        <img src="img_10_final.jpg" alt="Long Lined Duo Shorts" class="product-card-img" />
+        <div class="card-icons">
+          <button class="card-icon-btn wishlist" aria-label="Wishlist"><svg viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+          <button class="card-icon-btn" aria-label="Add to cart"><svg viewBox="0 0 24 24"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg></button>
+        </div>
+        <div class="product-card-info">
+          <div class="product-badge">In Stock</div>
+          <div class="product-name">Long Lined Duo Shorts</div>
+          <div class="product-footer">
+            <span class="product-price">R 550.00</span>
+            <div class="product-swatches">
+              <span class="swatch" style="background:#1a1a1a" title="Black"></span>
+              <span class="swatch" style="background:#6b7c5e" title="Olive"></span>
+              <span class="swatch" style="background:#d4c5a9" title="Sand"></span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SPORT HERO BANNER -->
+  <section class="sport-hero" id="sport">
+    <div class="sport-hero-bg" id="sport-parallax"></div>
+    <div class="sport-hero-overlay"></div>
+    <div class="sport-hero-content">
+      <div class="sport-hero-label reveal">Fieka Sport</div>
+      <h2 class="sport-hero-title reveal delay-1">Unleash Your<br />Inner Athlete</h2>
+      <a href="Fieka Sport — Team Kits.html" class="btn-primary reveal delay-2" style="display:inline-block; margin-top:40px;">View All Kits</a>
+    </div>
+  </section>
+
+  <!-- SPORT CODES / KITS -->
+  <section class="kits-section" id="kits">
+    <div class="kits-header">
+      <div>
+        <div class="section-label reveal">Team Kits</div>
+        <h2 class="section-heading reveal delay-1">Sport Codes</h2>
+      </div>
+      <a href="#quote" class="view-all-link reveal delay-2">Request a Quote</a>
+    </div>
+    <div class="kits-grid">
+      <div class="kit-card reveal delay-1">
+        <img src="sport-netball.jpg" alt="Netball Kit" />
+        <div class="kit-card-info">
+          <div class="kit-name">Netball Kits</div>
+          <div class="kit-customizable">Customizable</div>
+          <a href="#quote" class="kit-cta">View Kits</a>
+        </div>
+      </div>
+      <div class="kit-card reveal delay-2">
+        <img src="sport-football.jpg" alt="Football Kit" />
+        <div class="kit-card-info">
+          <div class="kit-name">Football Kits</div>
+          <div class="kit-customizable">Customizable</div>
+          <a href="#quote" class="kit-cta">View Kits</a>
+        </div>
+      </div>
+      <div class="kit-card reveal delay-3">
+        <img src="sport-swimming.jpg" alt="Swimming Kit" />
+        <div class="kit-card-info">
+          <div class="kit-name">Swimming Kits</div>
+          <div class="kit-customizable">Customizable</div>
+          <a href="#quote" class="kit-cta">View Kits</a>
+        </div>
+      </div>
+      <div class="kit-card reveal delay-4">
+        <img src="sport-rugby.jpg" alt="Rugby Kit" />
+        <div class="kit-card-info">
+          <div class="kit-name">Rugby Kits</div>
+          <div class="kit-customizable">Customizable</div>
+          <a href="#quote" class="kit-cta">View Kits</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar">
+    <div class="stat-item reveal">
+      <div class="stat-number" data-target="500">0</div>
+      <div class="stat-label">Teams Kitted Out</div>
+    </div>
+    <div class="stat-item reveal delay-1">
+      <div class="stat-number" data-target="48">0</div>
+      <div class="stat-label">Hour Turnaround</div>
+    </div>
+    <div class="stat-item reveal delay-2">
+      <div class="stat-number" data-target="100">0</div>
+      <div class="stat-label">% South African Made</div>
+    </div>
+    <div class="stat-item reveal delay-3">
+      <div class="stat-number" data-target="4">0</div>
+      <div class="stat-label">Sport Disciplines</div>
+    </div>
+  </div>
+
+  <!-- QUOTE FORM -->
+  <section class="quote-section" id="quote">
+    <div class="quote-inner">
+      <div class="quote-icon reveal">
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="4" y="4" width="32" height="26" rx="4" stroke="#000" stroke-width="2"/>
+          <path d="M4 22l8-8 8 8 8-10 8 8" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="quote-title reveal">Request<br />a Quote</h2>
+      <p class="quote-sub reveal delay-1">Tell us about your team and we'll get back to you within 48 hours.</p>
+      <form class="quote-form reveal delay-2" onsubmit="return false;">
+        <div class="form-row">
+          <input class="form-input" type="text" placeholder="Team / Organisation Name" />
+          <input class="form-input" type="text" placeholder="Sport Type (e.g. Football)" />
+        </div>
+        <input class="form-input form-select" type="number" placeholder="Quantity (e.g. 25)" min="1" />
+        <textarea class="form-input form-textarea" placeholder="Describe your design idea — colours, style, logos..."></textarea>
+        <div class="form-row">
+          <input class="form-input" type="text" placeholder="Contact Name" />
+          <input class="form-input" type="email" placeholder="Email Address" />
+        </div>
+        <input class="form-input" type="tel" placeholder="Phone Number (optional)" />
+        <button type="submit" class="btn-submit">Request a Quote</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- CATEGORY CARDS -->
+  <section class="categories-section">
+    <div class="cat-card reveal-left">
+      <img src="img_00.jpeg" alt="Women's" />
+      <div class="cat-card-content">
+        <div class="cat-card-label">Shop Now</div>
+        <div class="cat-card-title">Women's</div>
+        <div class="cat-card-desc">Functional Apparel<br />for Active Women</div>
+        <a href="#" class="cat-card-cta">Explore</a>
+      </div>
+    </div>
+    <div class="cat-card reveal">
+      <img src="img_07.png" alt="Men's" style="object-position: center top;" />
+      <div class="cat-card-content">
+        <div class="cat-card-label">Shop Now</div>
+        <div class="cat-card-title">Men's</div>
+        <div class="cat-card-desc">Functional Apparel<br />for Active Men</div>
+        <a href="#" class="cat-card-cta">Explore</a>
+      </div>
+    </div>
+    <div class="cat-card reveal-right">
+      <img src="img_11.png" alt="Sport" />
+      <div class="cat-card-content">
+        <div class="cat-card-label">Shop Now</div>
+        <div class="cat-card-title">Sport</div>
+        <div class="cat-card-desc">Performance-Driven<br />Apparel for Athletes</div>
+        <a href="#kits" class="cat-card-cta">Explore</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <img src="img_27.png" alt="Fieka" />
+        <p class="footer-tagline">Designed in Cape Town. Built for discipline and growth. Created for those who train with purpose.</p>
+      </div>
+      <div>
+        <div class="footer-col-title">Fieka Sports</div>
+        <div class="footer-links">
+          <a href="#">Team Kits</a>
+          <a href="#quote">Get a Quote</a>
+          <a href="#">Portfolio</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Shop</div>
+        <div class="footer-links">
+          <a href="#">Hoodies</a>
+          <a href="#">Sweatpants</a>
+          <a href="#">T-Shirts</a>
+          <a href="#">Leggings</a>
+          <a href="#">Tank Tops</a>
+        </div>
+      </div>
+      <div>
+        <div class="footer-col-title">Support</div>
+        <div class="footer-links">
+          <a href="#">FAQ</a>
+          <a href="#">Shipping &amp; Returns</a>
+          <a href="#">Contact</a>
+        </div>
+        <div class="footer-col-title" style="margin-top:30px;">Company</div>
+        <div class="footer-links">
+          <a href="#">About Fieka</a>
+          <a href="#">Instagram</a>
+          <a href="#">Twitter</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2025 Fieka Sports. All rights reserved.</span>
+      <div class="social-links">
+        <a href="#">Instagram</a>
+        <a href="#">Twitter</a>
+        <a href="#">TikTok</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ─── LOADER ──────────────────────────────────────────────── */
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+        // Trigger hero animations
+        document.getElementById('hero-eyebrow').classList.add('visible');
+        document.getElementById('word-1').classList.add('visible');
+        document.getElementById('word-2').classList.add('visible');
+        document.getElementById('hero-subtitle').classList.add('visible');
+        document.getElementById('hero-ctas').classList.add('visible');
+      }, 2000);
+    });
+
+    /* ─── CUSTOM CURSOR ───────────────────────────────────────── */
+    const dot = document.getElementById('cursor-dot');
+    const ring = document.getElementById('cursor-ring');
+    let ringX = 0, ringY = 0, dotX = 0, dotY = 0;
+    let mouseX = 0, mouseY = 0;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      dot.style.left = mouseX + 'px';
+      dot.style.top = mouseY + 'px';
+    });
+
+    function animateCursor() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      ring.style.left = ringX + 'px';
+      ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateCursor);
+    }
+    animateCursor();
+
+    /* ─── HEADER SCROLL (announcement bar + nav together) ────── */
+    const siteHeader = document.getElementById('site-header');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 20) siteHeader.classList.add('scrolled');
+      else siteHeader.classList.remove('scrolled');
+    }, { passive: true });
+
+    /* ─── PARALLAX (sport section only — hero is natural img) ─── */
+    const sportBg = document.getElementById('sport-parallax');
+
+    window.addEventListener('scroll', () => {
+      const sportSection = document.getElementById('sport');
+      if (sportSection && sportBg) {
+        const rect = sportSection.getBoundingClientRect();
+        const offset = -rect.top * 0.2;
+        sportBg.style.transform = `scale(1.06) translateY(${offset}px)`;
+      }
+    }, { passive: true });
+
+    /* ─── INTERSECTION OBSERVER ───────────────────────────────── */
+    const revealEls = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+    revealEls.forEach(el => observer.observe(el));
+
+    /* ─── COUNTER ANIMATION ───────────────────────────────────── */
+    const counters = document.querySelectorAll('[data-target]');
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const el = entry.target;
+          const target = parseInt(el.dataset.target);
+          const suffix = el.dataset.suffix || '+';
+          let current = 0;
+          const increment = target / 60;
+          const timer = setInterval(() => {
+            current += increment;
+            if (current >= target) {
+              el.textContent = target + suffix;
+              clearInterval(timer);
+            } else {
+              el.textContent = Math.floor(current) + suffix;
+            }
+          }, 18);
+          counterObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+
+    counters.forEach(el => {
+      el.dataset.suffix = '+';
+      counterObserver.observe(el);
+    });
+
+    /* ─── MOBILE MENU ─────────────────────────────────────────── */
+    const burger = document.querySelector('.nav-burger');
+    const navLinks = document.querySelector('.nav-links');
+    let menuOpen = false;
+    if (burger) {
+      burger.addEventListener('click', () => {
+        menuOpen = !menuOpen;
+        navLinks.style.display = menuOpen ? 'flex' : '';
+        navLinks.style.flexDirection = menuOpen ? 'column' : '';
+        navLinks.style.position = menuOpen ? 'absolute' : '';
+        navLinks.style.top = menuOpen ? '70px' : '';
+        navLinks.style.left = menuOpen ? '0' : '';
+        navLinks.style.right = menuOpen ? '0' : '';
+        navLinks.style.padding = menuOpen ? '24px 20px' : '';
+        navLinks.style.background = menuOpen ? 'rgba(0,0,0,0.96)' : '';
+        navLinks.style.borderBottom = menuOpen ? '1px solid rgba(255,255,255,0.1)' : '';
+        burger.children[0].style.transform = menuOpen ? 'rotate(45deg) translate(4.5px, 4.5px)' : '';
+        burger.children[1].style.opacity = menuOpen ? '0' : '';
+        burger.children[2].style.transform = menuOpen ? 'rotate(-45deg) translate(4.5px, -4.5px)' : '';
+      });
+    }
+
+    /* ─── SMOOTH PRODUCT HOVER AUDIO-LIKE FEEL ────────────────── */
+    document.querySelectorAll('.product-card, .kit-card, .cat-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = ((e.clientX - rect.left) / rect.width - 0.5) * 8;
+        const y = ((e.clientY - rect.top) / rect.height - 0.5) * 8;
+        card.style.transform = `perspective(600px) rotateX(${-y}deg) rotateY(${x}deg)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = '';
+      });
+    });
+  </script>
+</body>
+</html>
